@@ -4,12 +4,15 @@
   "description": "learning express nodejs and mongoDb",
   "main": "app.js",
   "scripts": {
+    "start": "node Server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "suraksha rathi",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "morgan": "^1.9.1"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"

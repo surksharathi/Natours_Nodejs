@@ -1,43 +1,28 @@
 const Express = require('express');
-const fs = require('fs');
+const tourRouter = require('./routes/tourRouter');
+const morgan = require('morgan');
+const userRouter = require('./routes/userRouter');
 const app = Express();
-const port = 3000;
 
+//1) Middle ware
+app.use(Express.static(`${__dirname}/public`));
 app.use(Express.json());
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
-app.get('/api/v1/tours', (req, res) => {
-  res.status(200).json({
-    status: 'Success',
-    result: tours.length,
-    data: {
-      tours
-    }
-  });
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+app.use((req, res, next) => {
+  console.log('Hello to middleware');
+  next();
 });
 
-app.post('/api/v1/tours', (req, res) => {
-  // console.log(tours);
-  const newId = tours[tours.length - 1].id + 1;
-  console.log(tours[tours.length - 1].id + 1);
-  const newTours = Object.assign({ id: newId }, req.body);
-  tours.push(newTours);
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tours: newTours
-        }
-      });
-    }
-  );
-  console.log('Done');
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
 });
-app.listen(port, () => {
-  console.log(`App is running on port ${port}.......`);
-});
+
+app.use('/api/v1/tours', tourRouter); // Router For Tour API
+app.use('/api/v1/users', userRouter); //Router for User API
+
+module.exports = app;
